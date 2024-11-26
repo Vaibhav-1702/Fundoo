@@ -12,6 +12,7 @@ namespace Fundoo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class NotesController : ControllerBase
     {
         private readonly INoteBL _noteBL;
@@ -29,9 +30,9 @@ namespace Fundoo.Controllers
         }
 
         [HttpPut("Update-note")]
-        public async Task<ResponseModel<Note>> UpdateNote(int noteId, UpdateNote updatedNote)
+        public async Task<ResponseModel<Note>> UpdateNote(int noteId, int userId, UpdateNote updatedNote)
         {
-            return await _noteBL.UpdateNote(noteId, updatedNote);
+            return await _noteBL.UpdateNote(noteId, userId, updatedNote);
         }
 
         [HttpPost("Archive-note")]
@@ -40,7 +41,7 @@ namespace Fundoo.Controllers
             return await _noteBL.ArchiveNote(noteId);
         }
 
-       // [Authorize]
+        [Authorize]
         [HttpGet("GetByNoteId")]
         public async Task<ResponseModel<Note>> GetNoteById(int noteId)
         {
@@ -54,9 +55,9 @@ namespace Fundoo.Controllers
         }
 
         [HttpDelete("DeleteById")]
-        public async Task<ResponseModel<Note>> DeleteNoteById(int noteId, bool isDeleted)
+        public async Task<ResponseModel<Note>> DeleteNoteById(int noteId, int userId, bool isDeleted)
         {
-            return await _noteBL.DeleteNoteById(noteId, isDeleted);
+            return await _noteBL.DeleteNoteById(noteId, userId, isDeleted);
         }
     }
 }

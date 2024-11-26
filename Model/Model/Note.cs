@@ -31,5 +31,7 @@ namespace Model.Model
 
         public ICollection<Collaborator> Collaborators { get; set; } = new List<Collaborator>();
 
+        public ICollection<Label> Labels { get; set; } = new List<Label>();
+
     }
 }

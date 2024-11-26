@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(FundooContext))]
-    [Migration("20241119093410_Collaborator")]
-    partial class Collaborator
+    [Migration("20241122104628_Fundoo")]
+    partial class Fundoo
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,21 @@ namespace DataLayer.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("LabelNote", b =>
+                {
+                    b.Property<int>("LabelsLabelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NotesNoteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LabelsLabelId", "NotesNoteId");
+
+                    b.HasIndex("NotesNoteId");
+
+                    b.ToTable("NoteLabels", (string)null);
+                });
 
             modelBuilder.Entity("Model.Model.Collaborator", b =>
                 {
@@ -45,6 +60,23 @@ namespace DataLayer.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Collaborators");
+                });
+
+            modelBuilder.Entity("Model.Model.Label", b =>
+                {
+                    b.Property<int>("LabelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LabelId"), 1L, 1);
+
+                    b.Property<string>("LabelName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LabelId");
+
+                    b.ToTable("label");
                 });
 
             modelBuilder.Entity("Model.Model.Note", b =>
@@ -113,6 +145,21 @@ namespace DataLayer.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("LabelNote", b =>
+                {
+                    b.HasOne("Model.Model.Label", null)
+                        .WithMany()
+                        .HasForeignKey("LabelsLabelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Model.Model.Note", null)
+                        .WithMany()
+                        .HasForeignKey("NotesNoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Model.Model.Collaborator", b =>

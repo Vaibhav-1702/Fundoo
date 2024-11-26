@@ -45,16 +45,23 @@ namespace Fundoo.Controllers
             return await _userBL.ValidateUser(login);
         }
 
-        [HttpGet("--")]
-        public string GenerateToken(Login user)
-        {
-            return _userBL.GenerateToken(user);
-        }
-
         [HttpPost("Token")]
         public async Task<string> Login(Login users)
         {
             return await _userBL.Login(users);
+        }
+
+        [HttpPost("Forget-Password")]
+        public async Task<ResponseModel<string>> ForgotPassword(string email)
+        {
+            return await _userBL.ForgotPassword(email);
+        }
+
+
+        [HttpPost("Reset-Password")]
+        public async Task<ResponseModel<string>> ResetPassword(string token, string newPassword)
+        {
+            return await _userBL.ResetPassword(token, newPassword);
         }
     }
 }

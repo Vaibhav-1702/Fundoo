@@ -18,9 +18,11 @@ namespace DataLayer.Interface
 
         public Task<User> ValidateUser(Login login);
 
-        public string GenerateToken(Login user);
-
         public Task<string> Login(Login users);
+
+        public Task<ResponseModel<string>> ForgotPassword(string email);
+
+        public Task<ResponseModel<string>> ResetPassword(string token, string newPassword);
 
 
     }

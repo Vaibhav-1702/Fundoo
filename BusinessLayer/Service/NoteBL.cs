@@ -25,9 +25,9 @@ namespace BusinessLayer.Service
             return await _noteDL.CreateNote(userId,note);
         }
 
-        public async Task<ResponseModel<Note>> UpdateNote(int noteId, UpdateNote updatedNote)
+        public async Task<ResponseModel<Note>> UpdateNote(int noteId, int userId, UpdateNote updatedNote)
         {
-            return await _noteDL.UpdateNote(noteId,updatedNote);
+            return await _noteDL.UpdateNote(noteId,userId,updatedNote);
         }
 
         public async Task<ResponseModel<Note>> ArchiveNote(int noteId)
@@ -45,9 +45,9 @@ namespace BusinessLayer.Service
             return await _noteDL.GetNotesByUserId(userId);
         }
 
-        public async Task<ResponseModel<Note>> DeleteNoteById(int noteId, bool isDeleted)
+        public async Task<ResponseModel<Note>> DeleteNoteById(int noteId, int userId, bool isDeleted)
         {
-            return await _noteDL.DeleteNoteById(noteId, isDeleted);
+            return await _noteDL.DeleteNoteById(noteId,userId, isDeleted);
         }
     }
 }

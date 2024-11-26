@@ -34,14 +34,20 @@ namespace BusinessLayer.Service
             return await _userDL.ValidateUser(login);
         }
 
-        public string GenerateToken(Login user)
-        {
-            return _userDL.GenerateToken(user);
-        }
 
         public async Task<string> Login(Login users)
         {
             return await _userDL.Login(users);
+        }
+
+        public async Task<ResponseModel<string>> ForgotPassword(string email)
+        {
+            return await _userDL.ForgotPassword(email);
+        }
+
+        public async Task<ResponseModel<string>> ResetPassword(string token, string newPassword)
+        {
+            return await _userDL.ResetPassword(token, newPassword);
         }
     }
 }

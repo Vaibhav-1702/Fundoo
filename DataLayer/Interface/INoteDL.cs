@@ -14,7 +14,7 @@ namespace DataLayer.Interface
     {
         public Task<ResponseModel<Note>> CreateNote(int userId,CreateNote note);
 
-        public Task<ResponseModel<Note>> UpdateNote(int noteId, UpdateNote updatedNote);
+        public Task<ResponseModel<Note>> UpdateNote(int noteId,int userId, UpdateNote updatedNote);
 
         public Task<ResponseModel<Note>> ArchiveNote(int noteId);
 
@@ -22,7 +22,7 @@ namespace DataLayer.Interface
 
         public Task<ResponseModel<List<Note>>> GetNotesByUserId(int userId);
 
-        public Task<ResponseModel<Note>> DeleteNoteById(int noteId, bool isDeleted);
+        public Task<ResponseModel<Note>> DeleteNoteById(int noteId, int userId, bool isDeleted);
 
 
 

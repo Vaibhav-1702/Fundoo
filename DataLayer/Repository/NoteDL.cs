@@ -74,34 +74,42 @@ namespace DataLayer.Repository
         }
 
 
-        public async Task<ResponseModel<Note>> UpdateNote(int noteId, UpdateNote updatedNote)
+        public async Task<ResponseModel<Note>> UpdateNote(int noteId, int userId, UpdateNote updatedNote)
         {
             try
             {
-                // Find the note by its ID
-                var note = await _Context.notes.FirstOrDefaultAsync(n => n.NoteId == noteId);
+                // Retrieve the note with collaborators
+                var note = await _Context.notes
+                    .Include(n => n.Collaborators)
+                    .FirstOrDefaultAsync(n => n.NoteId == noteId);
 
                 if (note == null)
                 {
-                    return new ResponseModel<Note>
-                    {
-                        Data = null,
-                        StatusCode = (int)HttpStatusCode.NotFound,
-                        Message = "Note not found",
-                        Success = false
-                    };
+                    throw new KeyNotFoundException($"Note with ID {noteId} does not exist.");
                 }
 
-                // Update note properties
+               
+                bool isAuthorized = note.UserId == userId ||
+                                    note.Collaborators.Any(c => c.UserId == userId);
+
+                if (!isAuthorized)
+                {
+                    throw new UnauthorizedAccessException("You are not authorized to update this note.");
+                }
+
+                // Map updated DTO values to the entity
                 note.Title = updatedNote.Title;
                 note.Description = updatedNote.Description;
-                note.UpdatedAt = DateTime.Now;
                 note.Color = updatedNote.Color;
                 note.IsArchived = updatedNote.IsArchived;
+                note.IsDeleted = updatedNote.IsDeleted;
+                note.UpdatedAt = DateTime.Now;
 
+                // Update the entity
                 _Context.notes.Update(note);
                 await _Context.SaveChangesAsync();
 
+                // Return success response
                 return new ResponseModel<Note>
                 {
                     Data = note,
@@ -133,6 +141,7 @@ namespace DataLayer.Repository
                 };
             }
         }
+
 
 
         public async Task<ResponseModel<Note>> ArchiveNote(int noteId)
@@ -275,11 +284,11 @@ namespace DataLayer.Repository
         }
 
 
-        public async Task<ResponseModel<Note>> DeleteNoteById(int noteId, bool isDeleted)
+        public async Task<ResponseModel<Note>> DeleteNoteById(int noteId, int userId, bool isDeleted)
         {
             try
             {
-                // Find the note by its ID
+                
                 var note = await _Context.notes.FirstOrDefaultAsync(n => n.NoteId == noteId);
 
                 if (note == null)
@@ -289,6 +298,18 @@ namespace DataLayer.Repository
                         Data = null,
                         StatusCode = (int)HttpStatusCode.NotFound,
                         Message = "Note not found",
+                        Success = false
+                    };
+                }
+
+                
+                if (note.UserId != userId)
+                {
+                    return new ResponseModel<Note>
+                    {
+                        Data = null,
+                        StatusCode = (int)HttpStatusCode.Forbidden,
+                        Message = "You do not have permission to delete this note",
                         Success = false
                     };
                 }
@@ -348,6 +369,7 @@ namespace DataLayer.Repository
                 };
             }
         }
+
 
 
 
