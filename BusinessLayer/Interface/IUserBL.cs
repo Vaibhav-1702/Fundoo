@@ -15,6 +15,12 @@ namespace BusinessLayer.Interface
 
         public Task<ResponseModel<User>> UpdateRegisterUser(int id, UserRegistration updatedUser);
 
+        public Task<ResponseModel<List<User>>> GetAllUsers();
+
+        public Task<ResponseModel<User>> GetUserById(int userId);
+
+        public Task<ResponseModel<bool>> DeleteUserById(int userId);
+
         public Task<User> ValidateUser(Login login);
 
         public Task<string> Login(Login users);

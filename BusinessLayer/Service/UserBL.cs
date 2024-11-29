@@ -29,6 +29,21 @@ namespace BusinessLayer.Service
             return await (_userDL.UpdateRegisterUser(id, updatedUser));
         }
 
+        public async Task<ResponseModel<List<User>>> GetAllUsers()
+        {
+            return await _userDL.GetAllUsers();
+        }
+
+        public async Task<ResponseModel<User>> GetUserById(int userId)
+        {
+            return await _userDL.GetUserById(userId);
+        }
+
+        public async Task<ResponseModel<bool>> DeleteUserById(int userId)
+        {
+            return await _userDL.DeleteUserById(userId);  
+        }
+
         public async Task<User> ValidateUser(Login login)
         {
             return await _userDL.ValidateUser(login);

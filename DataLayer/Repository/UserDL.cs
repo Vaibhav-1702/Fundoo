@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
-//using System.Net.Mail;
+
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -141,6 +141,113 @@ namespace DataLayer.Repository
                 };
             }
         }
+
+        
+        public async Task<ResponseModel<List<User>>> GetAllUsers()
+        {
+            try
+            {
+                var users = await _context.users.ToListAsync();
+
+                return new ResponseModel<List<User>>
+                {
+                    Data = users,
+                    Message = "Users retrieved successfully",
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel<List<User>>
+                {
+                    Data = null,
+                    Message = "Error retrieving users",
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Success = false
+                };
+            }
+        }
+
+        
+        public async Task<ResponseModel<User>> GetUserById(int userId)
+        {
+            try
+            {
+                var user = await _context.users.FindAsync(userId);
+
+                if (user == null)
+                {
+                    return new ResponseModel<User>
+                    {
+                        Data = null,
+                        Message = "User not found",
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+
+                return new ResponseModel<User>
+                {
+                    Data = user,
+                    Message = "User retrieved successfully",
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel<User>
+                {
+                    Data = null,
+                    Message = "Error retrieving user",
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Success = false
+                };
+            }
+        }
+
+        
+        public async Task<ResponseModel<bool>> DeleteUserById(int userId)
+        {
+            try
+            {
+                var user = await _context.users.FindAsync(userId);
+
+                if (user == null)
+                {
+                    return new ResponseModel<bool>
+                    {
+                        Data = false,
+                        Message = "User not found",
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+
+                _context.users.Remove(user);
+                await _context.SaveChangesAsync();
+
+                return new ResponseModel<bool>
+                {
+                    Data = true,
+                    Message = "User deleted successfully",
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel<bool>
+                {
+                    Data = false,
+                    Message = "Error deleting user",
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Success = false
+                };
+            }
+        }
+
 
         public async Task<User> ValidateUser(Login login)
         {

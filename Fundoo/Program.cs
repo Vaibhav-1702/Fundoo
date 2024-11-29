@@ -36,6 +36,7 @@ builder.Services.AddTransient<ICollaboratorBL, CollaboratorBL>();
 builder.Services.AddTransient<ICollaboratorDL, CollaboratorDL>();
 builder.Services.AddTransient<ILabelBL, LabelBL>();
 builder.Services.AddTransient<ILabelDL, LabelDL>();
+builder.Services.AddTransient<ICacheDL, CacheDL>(); 
 
 
 
