@@ -22,6 +22,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace DataLayer.Repository
 {
@@ -30,23 +31,30 @@ namespace DataLayer.Repository
         private readonly FundooContext _context;
         private readonly IConfiguration _configuration;
         private readonly TokenUtility _tokenUtility;
+        private readonly ILogger<UserDL> _logger;
+        private readonly RabbitMQPublisher _rabbitMQPublisher;
 
 
-        public UserDL(FundooContext context, IConfiguration configuration, TokenUtility tokenUtility)
+        public UserDL(FundooContext context, IConfiguration configuration, TokenUtility tokenUtility,ILogger<UserDL> logger,RabbitMQPublisher rabbitMQPublisher)
         {
             _context = context;
             _configuration = configuration;
             _tokenUtility = tokenUtility;
+            _logger = logger;
+           _rabbitMQPublisher = rabbitMQPublisher;
+
         }
 
 
         public async Task<ResponseModel<User>> Registration(UserRegistration userRegistration)
         {
+            _logger.LogInformation("Registration process started for {Email}", userRegistration.emailAddress);
             try
             {
                 var user = _context.users.FirstOrDefault(user => user.EmailAddress.Equals(userRegistration.emailAddress));
                 if (user != null)
                 {
+                    _logger.LogWarning("Attempt to register an already existing user: {Email}", userRegistration.emailAddress);
                     throw new UserException("User Already Registered");
                 }
 
@@ -64,6 +72,12 @@ namespace DataLayer.Repository
             
                 await _context.SaveChangesAsync();
 
+                // Publish message to RabbitMQ
+                _rabbitMQPublisher.PublishToQueue("user_registration_queue", new { Email = user.EmailAddress, Name = user.Name });
+
+                _logger.LogInformation("User {Email} registered successfully and message sent to RabbitMQ", userRegistration.emailAddress);
+
+                _logger.LogInformation("User {Email} registered successfully", userRegistration.emailAddress);
 
                 return new ResponseModel<User>
                 {
@@ -75,6 +89,7 @@ namespace DataLayer.Repository
             }
             catch (UserException ex)
             {
+                _logger.LogError(ex, "Registration failed: User already exists");
                 return new ResponseModel<User>
                 {
                     Data = null,
@@ -86,6 +101,7 @@ namespace DataLayer.Repository
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred during registration for {Email}", userRegistration.emailAddress);
                 return new ResponseModel<User>
                 {
                     Data = null,
@@ -270,6 +286,7 @@ namespace DataLayer.Repository
 
         public async Task<string> Login(Login user)
         {
+            _logger.LogInformation("Login attempt for {Email}", user.emailAddress);
             var user_ = await ValidateUser(user); // Await the async UserLogin method
 
             if (user_ != null)
@@ -277,15 +294,17 @@ namespace DataLayer.Repository
                 try
                 {
                     var token = _tokenUtility.GenerateToken(user);
+                    _logger.LogInformation("Login successful for {Email}", user.emailAddress);
                     return token;
                 }
                 catch (Exception ex)
                 {
                     // Log exception (consider using a logging framework)
-                    Console.WriteLine($"Token generation failed: {ex.Message}");
+                    // Console.WriteLine($"Token generation failed: {ex.Message}");
+                    _logger.LogError(ex, "Token generation failed for {Email}", user.emailAddress);
                 }
             }
-
+            _logger.LogWarning("Invalid login attempt for {Email}", user.emailAddress);
             return null;
         }
 

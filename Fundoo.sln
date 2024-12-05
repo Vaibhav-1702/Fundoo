@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fundoo", "Fundoo\Fundoo.csproj", "{7809036B-A47B-4653-9A29-455ABC228DC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fundoo", "Fundoo\Fundoo.csproj", "{7809036B-A47B-4653-9A29-455ABC228DC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{00B04AD2-9C32-48C5-87B6-148D03FDD850}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Model", "Model\Model.csproj", "{00B04AD2-9C32-48C5-87B6-148D03FDD850}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "DataLayer\DataLayer.csproj", "{AEDF27D7-A709-49E5-B7AA-0F5D76CA2206}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayer", "DataLayer\DataLayer.csproj", "{AEDF27D7-A709-49E5-B7AA-0F5D76CA2206}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{700D7D8B-1543-4E72-97FB-96E13CCBFE29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{700D7D8B-1543-4E72-97FB-96E13CCBFE29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQConsumer", "RabbitMQConsumer\RabbitMQConsumer.csproj", "{F84E5E95-AFD7-492E-9CC6-D385A807BE36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{700D7D8B-1543-4E72-97FB-96E13CCBFE29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{700D7D8B-1543-4E72-97FB-96E13CCBFE29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{700D7D8B-1543-4E72-97FB-96E13CCBFE29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F84E5E95-AFD7-492E-9CC6-D385A807BE36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F84E5E95-AFD7-492E-9CC6-D385A807BE36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F84E5E95-AFD7-492E-9CC6-D385A807BE36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F84E5E95-AFD7-492E-9CC6-D385A807BE36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

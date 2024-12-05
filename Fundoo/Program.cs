@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using DataLayer.UtilityClass;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,8 +37,11 @@ builder.Services.AddTransient<ICollaboratorBL, CollaboratorBL>();
 builder.Services.AddTransient<ICollaboratorDL, CollaboratorDL>();
 builder.Services.AddTransient<ILabelBL, LabelBL>();
 builder.Services.AddTransient<ILabelDL, LabelDL>();
-builder.Services.AddTransient<ICacheDL, CacheDL>(); 
-
+builder.Services.AddTransient<ICacheDL, CacheDL>();
+builder.Services.AddSingleton<RabbitMQPublisher>();
+builder.Services.AddSingleton<RegistrationEmailConsumerHostedService>();
+builder.Services.AddHostedService<RegistrationEmailConsumerHostedService>();
+//builder.Services.AddHostedService<RegistrationEmailConsumerHostedService>();
 
 
 // Configure JWT Authentication
@@ -92,6 +96,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        if (exceptionHandlerPathFeature?.Error != null)
+        {
+            var error = new { Message = "An error occurred.", Details = exceptionHandlerPathFeature.Error.Message };
+            await context.Response.WriteAsJsonAsync(error);
+        }
+    });
+});
 
 app.UseHttpsRedirection();
 

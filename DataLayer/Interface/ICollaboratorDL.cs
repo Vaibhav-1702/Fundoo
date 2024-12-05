@@ -1,4 +1,6 @@
-﻿using Model.Model;
+﻿using Model.DTO;
+using Model.Model;
+using Model.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ namespace DataLayer.Interface
 {
     public interface ICollaboratorDL
     {
-        public Task<string> AddCollaboratorAsync(int userId, int noteId);
+        public Task<ResponseModel<User>> AddCollaboratorAsync(AddCollaboratorDto dto);
 
         public Task<List<User>> GetCollaboratorsForNoteAsync(int noteId);
 

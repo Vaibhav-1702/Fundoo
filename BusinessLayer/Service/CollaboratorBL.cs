@@ -1,6 +1,8 @@
 ﻿using BusinessLayer.Interface;
 using DataLayer.Interface;
+using Model.DTO;
 using Model.Model;
+using Model.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +18,9 @@ namespace BusinessLayer.Service
         {
             _collaboratorDL = collaboratorDL;
         }
-        public async Task<string> AddCollaboratorAsync(int userId, int noteId)
+        public async Task<ResponseModel<User>> AddCollaboratorAsync(AddCollaboratorDto dto)
         {
-            return await _collaboratorDL.AddCollaboratorAsync(userId, noteId);
+            return await _collaboratorDL.AddCollaboratorAsync(dto);
         }
 
         public async Task<List<User>> GetCollaboratorsForNoteAsync(int noteId)

@@ -2,6 +2,7 @@
 using DataLayer.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Model.DTO;
 using Model.Model;
 using Model.Utility;
 using System.Net;
@@ -21,24 +22,12 @@ namespace Fundoo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCollaboratorAsync(int userId, int noteId)
+        public async Task<ResponseModel<User>> AddCollaboratorAsync(AddCollaboratorDto dto)
         {
-            var result  =  await _collaboratorBL.AddCollaboratorAsync(userId, noteId);
-            if (result == "User does not exist." || result == "Note does not exist.")
-            {
-                return NotFound(result);
-            }
-
-            if (result == "Collaborator already exists for this note.")
-            {
-                return BadRequest(result);
-            }
-
-            return Ok(result);
-
+            return await _collaboratorBL.AddCollaboratorAsync(dto);
         }
 
-        
+
         [HttpGet("Get-Collaborators-For-Note")]
         public async Task<ActionResult<List<User>>> GetCollaboratorsForNoteAsync(int noteId)
         {

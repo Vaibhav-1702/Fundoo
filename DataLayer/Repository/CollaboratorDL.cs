@@ -1,10 +1,13 @@
 ﻿using DataLayer.Context;
 using DataLayer.Interface;
 using Microsoft.EntityFrameworkCore;
+using Model.DTO;
 using Model.Model;
+using Model.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,42 +20,105 @@ namespace DataLayer.Repository
         {
             _context = context;
         }
-        public async Task<string> AddCollaboratorAsync(int userId, int noteId)
+
+        public async Task<ResponseModel<User>> AddCollaboratorAsync(AddCollaboratorDto dto)
         {
-            // Check if User exists
-            var userExists = await _context.users.AnyAsync(u => u.UserId == userId);
-            if (!userExists)
+            try
             {
-                return "User does not exist.";
+                
+                if (string.IsNullOrWhiteSpace(dto.EmailAddress))
+                {
+                    return new ResponseModel<User>
+                    {
+                        Data = null,
+                        Message = "Email address is required.",
+                        StatusCode = (int)HttpStatusCode.BadRequest,
+                        Success = false
+                    };
+                }
+
+                if (dto.NoteId <= 0)
+                {
+                    return new ResponseModel<User>
+                    {
+                        Data = null,
+                        Message = "Valid note ID is required.",
+                        StatusCode = (int)HttpStatusCode.BadRequest,
+                        Success = false
+                    };
+                }
+
+                
+                var user = await _context.users.FirstOrDefaultAsync(u => u.EmailAddress == dto.EmailAddress);
+                if (user == null)
+                {
+                    return new ResponseModel<User>
+                    {
+                        Data = null,
+                        Message = "User does not exist.",
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+
+                
+                var noteExists = await _context.notes.AnyAsync(n => n.NoteId == dto.NoteId);
+                if (!noteExists)
+                {
+                    return new ResponseModel<User>
+                    {
+                        Data = null,
+                        Message = "Note does not exist.",
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+
+                // Check if the collaborator already exists
+                var collaboratorExists = await _context.Collaborators
+                    .AnyAsync(c => c.UserId == user.UserId && c.NoteId == dto.NoteId);
+                if (collaboratorExists)
+                {
+                    return new ResponseModel<User>
+                    {
+                        Data = null,
+                        Message = "Collaborator already exists for this note.",
+                        StatusCode = (int)HttpStatusCode.BadRequest,
+                        Success = false
+                    };
+                }
+
+                // Add the collaborator
+                var collaborator = new Collaborator
+                {
+                    UserId = user.UserId,
+                    NoteId = dto.NoteId
+                };
+
+                _context.Collaborators.Add(collaborator);
+                await _context.SaveChangesAsync();
+
+                return new ResponseModel<User>
+                {
+                    Data = user,
+                    Message = "Collaborator added successfully.",
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true
+                };
             }
-
-            // Check if Note exists
-            var noteExists = await _context.notes.AnyAsync(n => n.NoteId == noteId);
-            if (!noteExists)
+            catch (Exception ex)
             {
-                return "Note does not exist.";
+                
+                return new ResponseModel<User>
+                {
+                    Data = null,
+                    Message = "An unexpected error occurred.",
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Success = false
+                };
             }
-
-            // Check if the collaborator already exists
-            var collaboratorExists = await _context.Collaborators
-                .AnyAsync(c => c.UserId == userId && c.NoteId == noteId);
-            if (collaboratorExists)
-            {
-                return "Collaborator already exists for this note.";
-            }
-
-            // Add the collaborator
-            var collaborator = new Collaborator
-            {
-                UserId = userId,
-                NoteId = noteId
-            };
-
-            _context.Collaborators.Add(collaborator);
-            await _context.SaveChangesAsync();
-
-            return "Collaborator added successfully.";
         }
+
 
         public async Task<List<User>> GetCollaboratorsForNoteAsync(int noteId)
         {
